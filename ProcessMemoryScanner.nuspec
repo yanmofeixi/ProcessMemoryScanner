@@ -1,0 +1,16 @@
+﻿<?xml version="1.0"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>ProcessMemoryReader</id>
+    <version>1.0.0</version>
+    <authors>yanmofeixi@gmail.com</authors>
+    <owners>yanmofeixi@gmail.com</owners>
+    <projectUrl>http://fubumvc.com</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Read, Write and AoB scan for process memorys</description>
+    <tags>memory aob scan</tags>
+  </metadata>
+  <files>
+	  <file src="bin\Release\ProcessMemoryScanner.dll" target="lib" />
+  </files>
+</package>
