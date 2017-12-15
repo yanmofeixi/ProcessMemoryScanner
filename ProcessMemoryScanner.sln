@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessMemoryScanner", "ProcessMemoryScanner.csproj", "{30880074-66A9-49D9-83B7-741B9379395A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{64306281-D686-444C-9CDB-575B04291220}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{30880074-66A9-49D9-83B7-741B9379395A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30880074-66A9-49D9-83B7-741B9379395A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30880074-66A9-49D9-83B7-741B9379395A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64306281-D686-444C-9CDB-575B04291220}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64306281-D686-444C-9CDB-575B04291220}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64306281-D686-444C-9CDB-575B04291220}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64306281-D686-444C-9CDB-575B04291220}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -93,9 +93,39 @@ namespace ProcessMemoryScanner
             return IntPtr.Add(memoryRegion.BaseAddress, memoryOffset);
         }
 
+        public IntPtr FindByAoBWithWildCard(byte?[] AoBSignature, MEMORY_BASIC_INFORMATION memoryRegion)
+        {
+            var memory = (this.ReadMemory(memoryRegion.BaseAddress, (uint)memoryRegion.RegionSize)).ToWildCardByteArray();
+            var memoryOffset = memory.IndexOfWithWildCard(AoBSignature);
+            if (memoryOffset == -1)
+            {
+                return IntPtr.Zero;
+            }
+            return IntPtr.Add(memoryRegion.BaseAddress, memoryOffset);
+        }
+
         public void ReplaceByAoB(byte[] AoBSignature, byte[] AoBToReplace, MEMORY_BASIC_INFORMATION memoryRegion)
         {
             this.WriteMemory(this.FindByAoB(AoBSignature, memoryRegion), AoBToReplace);
+        }
+
+        public void ReplaceByAoBWithWildCard(byte?[] AoBSignature, byte?[] AoBToReplace, MEMORY_BASIC_INFORMATION memoryRegion)
+        {
+            var address = this.FindByAoBWithWildCard(AoBSignature, memoryRegion);
+            var original = this.ReadMemory(address, (uint) AoBToReplace.Length);
+            var replace = new byte[AoBToReplace.Length];
+            for (var i = 0; i < AoBToReplace.Length; i++)
+            {
+                if(AoBToReplace[i] != null)
+                {
+                    replace[i] = (byte)AoBToReplace[i];
+                }
+                else
+                {
+                    replace[i] = original[i];
+                }
+            }
+            this.WriteMemory(address, replace);
         }
     }
 }
