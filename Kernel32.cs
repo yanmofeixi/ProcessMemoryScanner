@@ -21,6 +21,20 @@ namespace ProcessMemoryScanner
         }
 
         [Flags]
+        public enum ThreadAccess : int
+        {
+            TERMINATE = (0x0001),
+            SUSPEND_RESUME = (0x0002),
+            GET_CONTEXT = (0x0008),
+            SET_CONTEXT = (0x0010),
+            SET_INFORMATION = (0x0020),
+            QUERY_INFORMATION = (0x0040),
+            SET_THREAD_TOKEN = (0x0080),
+            IMPERSONATE = (0x0100),
+            DIRECT_IMPERSONATION = (0x0200)
+        }
+
+        [Flags]
         public enum ProcessAccessType
         {
             PROCESS_TERMINATE = (0x0001),
@@ -47,6 +61,15 @@ namespace ProcessMemoryScanner
         public static extern int VirtualQueryEx(IntPtr hProcess, IntPtr lpAddress, out MemoryScanner.MEMORY_BASIC_INFORMATION lpBuffer, uint dwLength);
 
         [DllImport("kernel32.dll")]
+        public static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
+
+        [DllImport("kernel32.dll")]
+        public static extern uint SuspendThread(IntPtr hThread);
+
+        [DllImport("kernel32.dll")]
+        public static extern int ResumeThread(IntPtr hThread);
+
+        [DllImport("kernel32.dll")]
         public static extern int CloseHandle(IntPtr hObject);
 
         [DllImport("kernel32.dll")]
@@ -54,5 +77,6 @@ namespace ProcessMemoryScanner
 
         [DllImport("kernel32.dll")]
         public static extern int WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [In, Out] byte[] buffer, uint size, out IntPtr lpNumberOfBytesWritten);
+
     }
 }

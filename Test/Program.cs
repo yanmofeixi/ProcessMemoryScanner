@@ -14,8 +14,7 @@ namespace Test
             m.Protect == 0x4 &&
             m.Type == 0x20000 &&
             m.RegionSize.ToInt32() > 0x3000000)[0];
-
-            memory.FindByAoBWithWildCard()
+            memory.ResumeProcess();
         }
 
         static bool IsFlashPlayerProcess(Process process)

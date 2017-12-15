@@ -9,6 +9,7 @@ namespace ProcessMemoryScanner
     public class MemoryScanner
     {
         private IntPtr handle;
+        private Process process;
         
         [StructLayout(LayoutKind.Sequential)]
         public struct MEMORY_BASIC_INFORMATION
@@ -24,8 +25,8 @@ namespace ProcessMemoryScanner
 
         public MemoryScanner(Func<Process, bool> filter)
         {
-            var process = Process.GetProcesses().SingleOrDefault(filter);
-            if(process == null)
+            this.process = Process.GetProcesses().SingleOrDefault(filter);
+            if(this.process == null)
             {
                 throw new InvalidOperationException($"Cannot find process!");
             }
@@ -33,7 +34,7 @@ namespace ProcessMemoryScanner
                                  Kernel32.ProcessAccessType.PROCESS_VM_READ |
                                  Kernel32.ProcessAccessType.PROCESS_VM_WRITE |
                                  Kernel32.ProcessAccessType.PROCESS_VM_OPERATION;
-            this.handle = Kernel32.OpenProcess((uint)access, 1, (uint)process.Id);
+            this.handle = Kernel32.OpenProcess((uint)access, 1, (uint)this.process.Id);
             if (this.handle == null)
             {
                 throw new InvalidOperationException("Cannot open process");
@@ -126,6 +127,38 @@ namespace ProcessMemoryScanner
                 }
             }
             this.WriteMemory(address, replace);
+        }
+
+        public void SuspendProcess()
+        {
+            foreach (ProcessThread pT in this.process.Threads)
+            {
+                var pOpenThread = Kernel32.OpenThread(Kernel32.ThreadAccess.SUSPEND_RESUME, false, (uint)pT.Id);
+                if (pOpenThread == IntPtr.Zero)
+                {
+                    continue;
+                }
+                Kernel32.SuspendThread(pOpenThread);
+                Kernel32.CloseHandle(pOpenThread);
+            }
+        }
+
+        public void ResumeProcess()
+        {
+            foreach (ProcessThread pT in this.process.Threads)
+            {
+                var pOpenThread = Kernel32.OpenThread(Kernel32.ThreadAccess.SUSPEND_RESUME, false, (uint)pT.Id);
+                if (pOpenThread == IntPtr.Zero)
+                {
+                    continue;
+                }
+                var suspendCount = 0;
+                do
+                {
+                    suspendCount = Kernel32.ResumeThread(pOpenThread);
+                } while (suspendCount > 0);
+                Kernel32.CloseHandle(pOpenThread);
+            }
         }
     }
 }
