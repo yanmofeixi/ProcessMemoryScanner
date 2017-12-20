@@ -1,5 +1,6 @@
 ﻿
 using ProcessMemoryScanner;
+using System;
 using System.Diagnostics;
 
 namespace Test
@@ -8,13 +9,9 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            var memory = new MemoryScanner(p => p.ProcessName == "chrome" && IsFlashPlayerProcess(p));
-            var memoryRegion = memory.FindMemoryRegion(m =>
-            m.State == 0x01000 &&
-            m.Protect == 0x4 &&
-            m.Type == 0x20000 &&
-            m.RegionSize.ToInt32() > 0x3000000)[0];
-            memory.ResumeProcess();
+            var memory = new MemoryScanner(p => p.ProcessName == "Tutorial-x86_64");
+            var a = memory.ReadMemory<int>(new IntPtr(0x034F5060));
+            memory.WriteMemory(new IntPtr(0x034F5060), 200);
         }
 
         static bool IsFlashPlayerProcess(Process process)

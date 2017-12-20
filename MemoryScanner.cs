@@ -40,7 +40,13 @@ namespace ProcessMemoryScanner
                 throw new InvalidOperationException("Cannot open process");
             }
         }
-        
+
+        public T ReadMemory<T>(IntPtr address)
+        {
+            var length = (uint)Marshal.SizeOf(default(T));
+            return (T)Convert.ChangeType(BitConverter.ToInt32(this.ReadMemory(address, length), 0), typeof(T));
+        }
+
         public byte[] ReadMemory(IntPtr address, uint byteArrayLength)
         {
             var lpNumberOfBytesRead = IntPtr.Zero;
@@ -54,6 +60,17 @@ namespace ProcessMemoryScanner
             var length = data.Length;
             var lpNumberOfBytesWritten = IntPtr.Zero;
             Kernel32.WriteProcessMemory(this.handle, address, data, (uint)data.Length, out lpNumberOfBytesWritten);
+        }
+
+        public void WriteMemory<T>(IntPtr address, T data)
+        {
+            var size = Marshal.SizeOf(data);
+            var bytes = new byte[size];
+            var ptr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(data, ptr, false);
+            Marshal.Copy(ptr, bytes, 0, size);
+            Marshal.FreeHGlobal(ptr);
+            this.WriteMemory(address, bytes);
         }
 
         public List<MEMORY_BASIC_INFORMATION> FindMemoryRegion(Func<MEMORY_BASIC_INFORMATION, bool> filter)
@@ -108,25 +125,6 @@ namespace ProcessMemoryScanner
         public void ReplaceByAoB(byte[] AoBSignature, byte[] AoBToReplace, MEMORY_BASIC_INFORMATION memoryRegion)
         {
             this.WriteMemory(this.FindByAoB(AoBSignature, memoryRegion), AoBToReplace);
-        }
-
-        public void ReplaceByAoBWithWildCard(byte?[] AoBSignature, byte?[] AoBToReplace, MEMORY_BASIC_INFORMATION memoryRegion)
-        {
-            var address = this.FindByAoBWithWildCard(AoBSignature, memoryRegion);
-            var original = this.ReadMemory(address, (uint) AoBToReplace.Length);
-            var replace = new byte[AoBToReplace.Length];
-            for (var i = 0; i < AoBToReplace.Length; i++)
-            {
-                if(AoBToReplace[i] != null)
-                {
-                    replace[i] = (byte)AoBToReplace[i];
-                }
-                else
-                {
-                    replace[i] = original[i];
-                }
-            }
-            this.WriteMemory(address, replace);
         }
 
         public void SuspendProcess()
