@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace ProcessMemoryScanner
 {
-    public class MemoryScanner
+    public class MemoryScanner : IDisposable
     {
         private IntPtr handle;
         private Process process;
@@ -157,6 +157,11 @@ namespace ProcessMemoryScanner
                 } while (suspendCount > 0);
                 Kernel32.CloseHandle(pOpenThread);
             }
+        }
+
+        public void Dispose()
+        {
+            Kernel32.CloseHandle(this.handle);
         }
     }
 }
