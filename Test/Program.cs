@@ -9,9 +9,8 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            var memory = new MemoryScanner(p => p.ProcessName == "Tutorial-x86_64");
-            var a = memory.ReadMemory<int>(new IntPtr(0x034F5060));
-            memory.WriteMemory(new IntPtr(0x034F5060), 200);
+            var memory = new MemoryScanner(p => p.ProcessName == "Zombidle");
+            var a = memory.ReadMemory<double>(new IntPtr(0x14B18878 - 0x8));
         }
 
         static bool IsFlashPlayerProcess(Process process)

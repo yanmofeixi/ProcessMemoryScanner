@@ -43,8 +43,13 @@ namespace ProcessMemoryScanner
 
         public T ReadMemory<T>(IntPtr address)
         {
-            var length = (uint)Marshal.SizeOf(default(T));
-            return (T)Convert.ChangeType(BitConverter.ToInt32(this.ReadMemory(address, length), 0), typeof(T));
+            var size = Marshal.SizeOf(default(T));
+            var bytes = this.ReadMemory(address, (uint) size);
+            var ptr = Marshal.AllocHGlobal(size);
+            Marshal.Copy(bytes, 0, ptr, size);
+            var toReturn = (T)Marshal.PtrToStructure(ptr, typeof(T));
+            Marshal.FreeHGlobal(ptr);
+            return toReturn;
         }
 
         public byte[] ReadMemory(IntPtr address, uint byteArrayLength)
