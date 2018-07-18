@@ -23,6 +23,36 @@ namespace ProcessMemoryScanner
             public uint Type;
         }
 
+        public enum State : uint
+        {
+            MEM_COMMIT = 0x00001000,
+            MEM_RESERVE = 0x00002000,
+            MEM_RESET = 0x00080000,
+            MEM_RESET_UNDO = 0x1000000
+        }
+
+        public enum AllocationProtect : uint
+        {
+            PAGE_EXECUTE = 0x00000010,
+            PAGE_EXECUTE_READ = 0x00000020,
+            PAGE_EXECUTE_READWRITE = 0x00000040,
+            PAGE_EXECUTE_WRITECOPY = 0x00000080,
+            PAGE_NOACCESS = 0x00000001,
+            PAGE_READONLY = 0x00000002,
+            PAGE_READWRITE = 0x00000004,
+            PAGE_WRITECOPY = 0x00000008,
+            PAGE_GUARD = 0x00000100,
+            PAGE_NOCACHE = 0x00000200,
+            PAGE_WRITECOMBINE = 0x00000400
+        }
+
+        public enum Type : uint
+        {
+            MEM_IMAGE = 0x1000000,
+            MEM_MAPPED = 0x40000,
+            MEM_PRIVATE = 0x20000
+        }
+
         public MemoryScanner(Func<Process, bool> filter)
         {
             this.process = Process.GetProcesses().SingleOrDefault(filter);
@@ -82,13 +112,13 @@ namespace ProcessMemoryScanner
         {
             var result = new List<MEMORY_BASIC_INFORMATION>();
             Kernel32.GetSystemInfo(out var systemInformation);
-            var minAddress = (long)systemInformation.minimumApplicationAddress;
-            var maxAddress = (long)systemInformation.maximumApplicationAddress;
+            var minAddress = (ulong)systemInformation.minimumApplicationAddress;
+            var maxAddress = (ulong)systemInformation.maximumApplicationAddress;
             var memoryDump = new MEMORY_BASIC_INFORMATION();
             var currentAddress = minAddress;
             while (currentAddress < maxAddress)
             {
-                var readResult = Kernel32.VirtualQueryEx(this.handle, new IntPtr(currentAddress), out memoryDump, (uint)Marshal.SizeOf(memoryDump));
+                var readResult = Kernel32.VirtualQueryEx(this.handle, new IntPtr((long)currentAddress), out memoryDump, (uint)Marshal.SizeOf(memoryDump));
                 if (readResult != 0)
                 {
                     if (filter(memoryDump))
@@ -100,7 +130,7 @@ namespace ProcessMemoryScanner
                 {
                     break;
                 }
-                currentAddress += memoryDump.RegionSize.ToInt64();
+                currentAddress += (ulong) memoryDump.RegionSize;
             }
             return result;
         }
